@@ -1,4 +1,6 @@
 {- LANGUAGE GeneralizedNewtypeDeriving -}
+import Control.Monad.Trans.MaybeT
+
 
 newtype Identity a = Identity { runIdentity :: a } deriving (Show)
 
@@ -36,7 +38,7 @@ instance (Functor f) => Functor (MaybeT f) where
 
 instance (Applicative f) => Applicative (MaybeT f) where
   pure a = MaybeT $ pure $ Just a
-  (<*>) (MaybeT mab) (MaybeT ma) = MaybeT $ (<*>) <$> mab <*> ma
+  (<*>) (MaybeT mab) (MaybeT Gma) = MaybeT $ (<*>) <$> mab <*> ma
 
 instance (Monad m) => Monad (MaybeT m) where
   (MaybeT ma) >>= f =  MaybeT $
@@ -96,8 +98,5 @@ instance (Monad m) => Functor (StateT s m) where
       (a', s') <- sma s
       return (f a', s')
 
-instance (Monad m) => Applicative (StateT s m) where
-  pure a = StateT $ \s -> pure (a, s)
 
-  (StateT smab) <*> (StateT sma) = State $ \s
-    let mab =
+
